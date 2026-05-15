@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\Role;
 use App\Models\Categoria;
 use App\Models\Comercio;
 use App\Models\InventarioMovimiento;
@@ -17,9 +18,10 @@ class LocalMarketSeeder extends Seeder
     public function run(): void
     {
         $admin = User::create([
-            'name' => 'Administrador LocalMarket',
-            'email' => 'admin@localmarket.test',
+            'name'     => 'Administrador LocalMarket',
+            'email'    => 'admin@localmarket.test',
             'password' => Hash::make('password'),
+            'role'     => Role::Admin,
         ]);
 
         $categorias = collect([
@@ -70,9 +72,10 @@ class LocalMarketSeeder extends Seeder
 
         foreach ($comerciosData as $data) {
             $user = User::create([
-                'name' => $data['user']['name'],
-                'email' => $data['user']['email'],
+                'name'     => $data['user']['name'],
+                'email'    => $data['user']['email'],
                 'password' => Hash::make('password'),
+                'role'     => Role::Comerciante,
             ]);
 
             $comercios->push(Comercio::create([
@@ -85,9 +88,10 @@ class LocalMarketSeeder extends Seeder
 
         for ($i = 1; $i <= 8; $i++) {
             $compradores->push(User::create([
-                'name' => "Comprador {$i}",
-                'email' => "comprador{$i}@localmarket.test",
+                'name'     => "Comprador {$i}",
+                'email'    => "comprador{$i}@localmarket.test",
                 'password' => Hash::make('password'),
+                'role'     => Role::Comprador,
             ]));
         }
 

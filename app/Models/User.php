@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Role;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -16,6 +17,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     protected $hidden = [
@@ -27,9 +29,39 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
+            'role'              => Role::class,   // cast automático al Enum
         ];
     }
+
+    // ── Helpers de rol ────────────────────────────────────────────────────────
+
+    public function isAdmin(): bool
+    {
+        return $this->role === Role::Admin;
+    }
+
+    public function isComerciante(): bool
+    {
+        return $this->role === Role::Comerciante;
+    }
+
+    public function isComprador(): bool
+    {
+        return $this->role === Role::Comprador;
+    }
+
+    public function isRepartidor(): bool
+    {
+        return $this->role === Role::Repartidor;
+    }
+
+    public function hasRole(Role $role): bool
+    {
+        return $this->role === $role;
+    }
+
+    // ── Relaciones ────────────────────────────────────────────────────────────
 
     public function comercio(): HasOne
     {
