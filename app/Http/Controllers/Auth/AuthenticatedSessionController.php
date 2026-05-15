@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
@@ -28,7 +29,20 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended($this->redirectTo());
+    }
+
+    /**
+     * Redirige al dashboard según el rol del usuario.
+     */
+    protected function redirectTo(): string
+    {
+        return match (auth()->user()->role) {
+            Role::Admin       => route('admin.dashboard'),
+            Role::Comerciante => route('comercio.dashboard'),
+            Role::Comprador   => route('tienda.index'),
+            Role::Repartidor  => route('repartidor.dashboard'),
+        };
     }
 
     /**
