@@ -1,11 +1,11 @@
 <?php
 
 use App\Http\Controllers\Admin\CategoriaController;
+use App\Http\Controllers\Admin\ComercioController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Support\Facades\Route;
 
-// ── Raíz ─────────────────────────────────────────────────────────────────────
+// ── Raíz ──────────────────────────────────────────────────────────────────────
 Route::get('/', function () {
     if (auth()->check()) {
         return match (auth()->user()->role) {
@@ -18,44 +18,34 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// ── Admin ─────────────────────────────────────────────────────────────────────
-Route::prefix('admin')
-    ->name('admin.')
-    ->middleware(['auth', 'role:admin'])
-    ->group(function () {
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-        Route::resource('categorias', CategoriaController::class);
-    });
+// ── Admin ──────────────────────────────────────────────────────────────────────
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::resource('categorias', CategoriaController::class);
+    Route::resource('comercios', ComercioController::class);
+    Route::post('comercios/{comercio}/toggle', [ComercioController::class, 'toggleActivo'])->name('comercios.toggle');
+});
 
-// ── Comerciante ───────────────────────────────────────────────────────────────
-Route::prefix('comercio')
-    ->name('comercio.')
-    ->middleware(['auth', 'role:comerciante'])
-    ->group(function () {
-        Route::get('/dashboard', function () {
-            return view('comercio.dashboard');
-        })->name('dashboard');
-    });
+// ── Comerciante ────────────────────────────────────────────────────────────────
+Route::prefix('comercio')->name('comercio.')->middleware(['auth', 'role:comerciante'])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('comercio.dashboard');
+    })->name('dashboard');
+});
 
-// ── Comprador / Tienda ────────────────────────────────────────────────────────
-Route::prefix('tienda')
-    ->name('tienda.')
-    ->middleware(['auth', 'role:comprador'])
-    ->group(function () {
-        Route::get('/', function () {
-            return view('tienda.index');
-        })->name('index');
-    });
+// ── Comprador / Tienda ─────────────────────────────────────────────────────────
+Route::prefix('tienda')->name('tienda.')->middleware(['auth', 'role:comprador'])->group(function () {
+    Route::get('/', function () {
+        return view('tienda.index');
+    })->name('index');
+});
 
-// ── Repartidor ────────────────────────────────────────────────────────────────
-Route::prefix('repartidor')
-    ->name('repartidor.')
-    ->middleware(['auth', 'role:repartidor'])
-    ->group(function () {
-        Route::get('/dashboard', function () {
-            return view('repartidor.dashboard');
-        })->name('dashboard');
-    });
+// ── Repartidor ─────────────────────────────────────────────────────────────────
+Route::prefix('repartidor')->name('repartidor.')->middleware(['auth', 'role:repartidor'])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('repartidor.dashboard');
+    })->name('dashboard');
+});
 
-// ── Auth (Breeze) ─────────────────────────────────────────────────────────────
+// ── Auth (Breeze) ──────────────────────────────────────────────────────────────
 require __DIR__.'/auth.php';
